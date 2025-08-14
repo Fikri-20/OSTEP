@@ -3,16 +3,6 @@
 1.
 fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -s 10 -c 
 
-ARG seed 10
-ARG fork_percentage 0.7
-ARG actions 5
-ARG action_list 
-ARG show_tree False
-ARG just_final False
-ARG leaf_only False
-ARG local_reparent False
-ARG print_style fancy
-ARG solve True
 
 ```
                            Process Tree:
@@ -42,17 +32,7 @@ Action: a forks e
 2. the larger fork_percentege I set, the larger the tree goes in depth (more forks).
 fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -a 10 -f 0.9 -c
 
-ARG seed -1
-ARG fork_percentage 0.9
-ARG actions 10
-ARG action_list 
-ARG show_tree False
-ARG just_final False
-ARG leaf_only False
-ARG local_reparent False
-ARG print_style fancy
-ARG solve True
-
+```
                            Process Tree:
                                a
 
@@ -131,20 +111,12 @@ Action: j forks k
                                │   ├── e
                                │   └── h
                                └── g
+```
+
 3. Yes, that's easy :)
 fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -t
 
-ARG seed -1
-ARG fork_percentage 0.7
-ARG actions 5
-ARG action_list 
-ARG show_tree True
-ARG just_final False
-ARG leaf_only False
-ARG local_reparent False
-ARG print_style fancy
-ARG solve False
-
+```
                            Process Tree:
                                a
 
@@ -169,24 +141,14 @@ Action?
                                ├── b
                                │   └── d
                                └── e
+```			       
 a forks b, b forks c, b forks d, c exits, a forks e.
 
   	     	      	       
 4. Yes, easy
 
 fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -F
-
-ARG seed -1
-ARG fork_percentage 0.7
-ARG actions 5
-ARG action_list 
-ARG show_tree False
-ARG just_final True
-ARG leaf_only False
-ARG local_reparent False
-ARG print_style fancy
-ARG solve False
-
+```
                            Process Tree:
                                a
 
@@ -197,6 +159,8 @@ Action: a forks e
 Action: a forks f
 
                         Final Process Tree?
+```
+```
 			a
 			|__ b
 			|   |__ c
@@ -204,20 +168,11 @@ Action: a forks f
 			|__ e
 			|__ f
 
+```
+
 5.
 fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -t -F
-
-ARG seed -1
-ARG fork_percentage 0.7
-ARG actions 5
-ARG action_list 
-ARG show_tree True
-ARG just_final True
-ARG leaf_only False
-ARG local_reparent False
-ARG print_style fancy
-ARG solve False
-
+```						 	   
                            Process Tree:
                                a
 
@@ -231,7 +186,9 @@ Action?
                                a
                                ├── b
                                └── d
-                                   └── e
+			       └── e
+```
+
     1. a forks b
     2. a forks c
     3. a forks d
