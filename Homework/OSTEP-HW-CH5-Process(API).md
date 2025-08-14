@@ -1,8 +1,6 @@
 
 # Homework (Simulation)
 1.
-fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -s 10 -c 
-
 
 ```
                            Process Tree:
@@ -29,8 +27,8 @@ Action: a forks e
                                └── e
 ```
 
-2. the larger fork_percentege I set, the larger the tree goes in depth (more forks).
-fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -a 10 -f 0.9 -c
+2.
+the larger fork_percentege I set, the larger the tree goes in depth (more forks).
 
 ```
                            Process Tree:
@@ -145,9 +143,9 @@ Action?
 a forks b, b forks c, b forks d, c exits, a forks e.
 
   	     	      	       
-4. Yes, easy
+4.
 
-fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -F
+Yes, easy
 ```
                            Process Tree:
                                a
