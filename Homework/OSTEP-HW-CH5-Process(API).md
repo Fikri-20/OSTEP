@@ -14,6 +14,7 @@ ARG local_reparent False
 ARG print_style fancy
 ARG solve True
 
+```
                            Process Tree:
                                a
 
@@ -36,6 +37,7 @@ Action: a forks e
                                ├── b
                                ├── d
                                └── e
+```
 
 2. the larger fork_percentege I set, the larger the tree goes in depth (more forks).
 fikri@Fikri:~/Desktop/OS/ostep-homework/cpu-api$ ./fork.py -a 10 -f 0.9 -c
