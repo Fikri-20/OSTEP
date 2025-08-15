@@ -274,3 +274,293 @@ int main(int argc, char* argv[]){
 When the two processes 
 - when the two processes write to the file at the same time (concurrently), they manage to write to the file one after the other, no corrpution or conflict of writing occurs, because the file writing is atomically, means it occurs one all (completely). So no problems here.
 
+
+3. Ok without using wait() sys call, the CPU scheduler is the one determines who run frist as these are two different processes. we could turn around the processor by using *signals*, the child will send a signal to the parent after printing hello, when signal is sent, a signal handler is executed (assuring that now we could run the parent routine), then parent run
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+
+volatile sig_atomic_t child_ready = 0;
+
+void signal_handler(int sig) {
+    child_ready = 1;
+}
+
+int main() {
+    signal(SIGUSR1, signal_handler);
+    
+    pid_t pid = fork();
+    
+    if (pid == 0) {
+        printf("hello\n");
+        kill(getppid(), SIGUSR1);
+        exit(0);
+    } else {
+        while (!child_ready) {
+            pause();
+        }
+        printf("goodbye\n");
+    }
+    
+    return 0;
+}
+```
+
+4.
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+
+int main() {    
+    pid_t pid = fork();
+    
+    if(pid < 0){
+        fprintf(stderr, "Fork Failed!");
+        exit(1);
+    }
+    if (pid == 0) {
+        printf("------ Child Space --------\n");
+        printf("hello\n");
+        execl("/bin/ls", "ls", "-l", NULL);
+        printf("This will never printed!");
+        exit(1);
+    } else {
+        printf("------ Parent Space --------\n");
+        printf("parent here\n");
+	exit(0);
+    }
+    
+    return 0;
+}
+```
+
+why there're variants of exec? Due to:
+    1. form of passing inputs to the new program: it could passed as list (l), or as vector (v), ..etc.
+    2. If you want to add new parameter to the new program, like executing in an environment (e)
+
+here are a summary of almost all variants of exec in linux:
+```c
+// execl - list args, full path, inherit env
+execl("/bin/cat", "cat", "file.txt", NULL);
+
+// execle - list args, full path, custom env
+char *env[] = {"PATH=/bin", NULL};
+execle("/bin/cat", "cat", "file.txt", NULL, env);
+
+// execlp - list args, search PATH, inherit env
+execlp("cat", "cat", "file.txt", NULL);
+
+// execv - vector args, full path, inherit env
+char *args[] = {"cat", "file.txt", NULL};
+execv("/bin/cat", args);
+
+// execvp - vector args, search PATH, inherit env
+char *args[] = {"cat", "file.txt", NULL};
+execvp("cat", args);
+
+// execvpe - vector args, search PATH, custom env
+char *args[] = {"cat", "file.txt", NULL};
+char *env[] = {"PATH=/bin", NULL};
+execvpe("cat", args, env);
+```
+
+5.
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+
+int main() {    
+    pid_t pid = fork();
+    
+    if(pid < 0){
+        fprintf(stderr, "Fork Failed!");
+        exit(1);
+    }
+    if (pid == 0) {
+        printf("------ Child Space --------\n");
+        printf("CHILD PID: %d\n", getpid());
+    }else{
+        int rc_wait = wait(NULL);
+        printf("------ Parent Space --------\n");
+        printf("PID: %d\n", getpid());
+        printf("rc_wait: %d\n", rc_wait);
+    }
+    
+    return 0;
+}
+```
+- wait returns the PID of the child process.
+- if put wait() in the child process it returns -1, as it's supposed to return the PID of the child process.
+
+6. waitpid() is more general, where we wait a specific child process, e.g., wait specific process with that PID, wait any child in the *same process group*. waitpid() is similar to wait() when sitting pid parameter of waitpid() to -1 (indicating wait for any child process.
+   - waitpid() is very beneficial for servers, shells, and any application managing multiple child processes!
+
+7. After closing the standard output, the child process couldn't print anything to the screen
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+
+int main() {    
+    pid_t pid = fork();
+    
+    if(pid < 0){
+        fprintf(stderr, "Fork Failed!");
+        exit(1);
+    }
+    if (pid == 0) {
+        printf("------ Child Space --------\n");        
+        printf("CHILD PID: %d\n", getpid());
+        close(STDOUT_FILENO); 
+        printf("garbage \n");
+    }else{
+        int rc_wait = wait(NULL);
+        printf("------ Parent Space --------\n");
+        printf("PARENT PID: %d\n", getpid());
+    }
+    
+    return 0;
+}
+```
+8.
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main() {
+    int pipefd[2];
+    pid_t child1, child2;
+    
+    printf("=== pipe() System Call Demo ===\n");
+    
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        exit(1);
+    }
+    
+    printf("Read end: fd %d, Write end: fd %d\n", pipefd[0], pipefd[1]);
+    
+    child1 = fork();
+    if (child1 == 0) {
+        printf("Child1 (Writer) PID: %d\n", getpid());
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+        
+        printf("Hello from Child1!\n");
+        printf("This is line 2\n");
+        printf("This is line 3\n");
+        printf("End of data from Child1\n");
+        
+        exit(0);
+    }
+    
+    child2 = fork();
+    if (child2 == 0) {
+        printf("Child2 (Reader) PID: %d\n", getpid());        
+        close(pipefd[1]);
+        dup2(pipefd[0], STDIN_FILENO);
+        close(pipefd[0]);
+        char buffer[256];
+        printf("Child2 reading from pipe:\n");
+        while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            printf("Child2 received: %s", buffer);
+        }
+        printf("Child2: End of input reached\n");
+        exit(0);
+    }
+    
+    printf("Parent created Child1: %d, Child2: %d\n", child1, child2);
+    
+    close(pipefd[0]);
+    close(pipefd[1]);
+    printf("Parent closed both pipe ends\n");
+    
+    // Wait for both children
+    waitpid(child1, NULL, 0);
+    printf("Child1 finished\n");
+    
+    waitpid(child2, NULL, 0);
+    printf("Child2 finished\n");
+    
+    printf("All done!\n");
+    return 0;
+}#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main() {
+    int pipefd[2];
+    pid_t child1, child2;
+    
+    printf("=== pipe() System Call Demo ===\n");
+    
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        exit(1);
+    }
+    
+    printf("Read end: fd %d, Write end: fd %d\n", pipefd[0], pipefd[1]);
+    
+    child1 = fork();
+    if (child1 == 0) {
+        printf("Child1 (Writer) PID: %d\n", getpid());
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+        
+        printf("Hello from Child1!\n");
+        printf("This is line 2\n");
+        printf("This is line 3\n");
+        printf("End of data from Child1\n");
+        
+        exit(0);
+    }
+    
+    child2 = fork();
+    if (child2 == 0) {
+        printf("Child2 (Reader) PID: %d\n", getpid());        
+        close(pipefd[1]);
+        dup2(pipefd[0], STDIN_FILENO);
+        close(pipefd[0]);
+        char buffer[256];
+        printf("Child2 reading from pipe:\n");
+        while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            printf("Child2 received: %s", buffer);
+        }
+        printf("Child2: End of input reached\n");
+        exit(0);
+    }
+    
+    printf("Parent created Child1: %d, Child2: %d\n", child1, child2);
+    
+    close(pipefd[0]);
+    close(pipefd[1]);
+    printf("Parent closed both pipe ends\n");
+    
+    // Wait for both children
+    waitpid(child1, NULL, 0);
+    printf("Child1 finished\n");
+    
+    waitpid(child2, NULL, 0);
+    printf("Child2 finished\n");
+    
+    printf("All done!\n");
+    return 0;
+}
+```
