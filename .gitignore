@@ -51,4 +51,4 @@ flycheck_*.el
 *.~undo-tree~
 
 # Homework directory at repo root
-/Homework/
+Homework/
