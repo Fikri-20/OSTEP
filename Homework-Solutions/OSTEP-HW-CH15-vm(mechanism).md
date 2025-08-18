@@ -57,4 +57,3 @@ No address is valid → 0 / 1024 = 0.0.
 So the as bigger the limit, the bigger the fraction of randomly-generated adress is valid
 So the relationship is almost linear.
 
-![[fraction_valid_vs_limit.png]]
