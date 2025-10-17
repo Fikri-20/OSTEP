@@ -2,7 +2,7 @@
 
 A complete Unix shell implementation in C, built as part of the [OSTEP (Operating Systems: Three Easy Pieces)](https://pages.cs.wisc.edu/~remzi/OSTEP/) project series.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [About](#about)
 - [Program Specification](#program-specification)
@@ -14,9 +14,10 @@ A complete Unix shell implementation in C, built as part of the [OSTEP (Operatin
 - [Implementation Details](#implementation-details)
 - [Project Structure](#project-structure)
 
-## 🎯 About
+## About
 
 **WISH** (Wisconsin Shell) is a simple yet fully-functional Unix shell that demonstrates core operating system concepts including:
+
 - Process creation and management
 - System call usage (fork, exec, wait, chdir, etc.)
 - I/O redirection
@@ -25,12 +26,14 @@ A complete Unix shell implementation in C, built as part of the [OSTEP (Operatin
 
 This implementation achieves **100% test pass rate (22/22 tests)** and fully complies with the OSTEP project specification.
 
-## 📖 Program Specification
+## Program Specification
 
-This project follows the official specification from the OSTEP projects repository:
-- **Full Specification**: [OSTEP Processes Shell Project](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/processes-shell)
+- This project follows the official specification from the OSTEP projects repository:
+
+- **Full Specification**: [OSTEP Processes Shell Project](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/processes-shell/README.md)
 
 ### Key Requirements
+
 - Interactive and batch mode operation
 - Built-in commands: `exit`, `cd`, `path`
 - Output redirection with `>`
@@ -38,10 +41,11 @@ This project follows the official specification from the OSTEP projects reposito
 - Proper error handling with standardized error messages
 - Support for executables in configurable search paths
 
-## ✨ Features
+## Features
 
 ### 🔧 Core Shell Functionality
-- **Interactive Mode**: Run the shell interactively with a `wish> ` prompt
+
+- **Interactive Mode**: Run the shell interactively with a `wish>` prompt
 - **Batch Mode**: Execute commands from a script file
 - **Process Management**: Creates child processes using `fork()` and `execv()`
 - **Command Parsing**: Uses `getline()` for robust input handling with spaces and newlines
@@ -49,30 +53,39 @@ This project follows the official specification from the OSTEP projects reposito
 ### 🏠 Built-in Commands
 
 #### `exit`
+
 Exits the shell cleanly.
+
 ```bash
 wish> exit
 ```
+
 - Takes no arguments (error if arguments provided)
 - Calls `exit(0)` system call
 
-#### `cd` 
+#### `cd`
+
 Changes the current working directory.
+
 ```bash
 wish> cd /tmp
 wish> cd ..
 ```
+
 - Requires exactly one argument (the target directory)
 - Uses `chdir()` system call
 - Errors on invalid paths or wrong number of arguments
 
 #### `path`
+
 Manages the executable search paths.
+
 ```bash
 wish> path /bin /usr/bin          # Set search paths
 wish> path /bin /usr/bin /usr/local/bin  # Multiple paths
 wish> path                         # Clear all paths
 ```
+
 - Takes 0 or more arguments
 - Completely overwrites the previous path
 - Default path: `/bin`
@@ -80,6 +93,7 @@ wish> path                         # Clear all paths
 ### 🔀 Output Redirection
 
 Redirect both stdout and stderr to a file using `>`:
+
 ```bash
 wish> ls -l > output.txt
 wish> ls /nonexistent > errors.txt   # Errors also redirected
@@ -87,6 +101,7 @@ wish> echo Hello World > greeting.txt
 ```
 
 **Features:**
+
 - Redirects both stdout AND stderr to the same file
 - Creates/truncates output files automatically
 - Supports redirection without spaces: `cmd>file` works!
@@ -99,6 +114,7 @@ wish> echo Hello World > greeting.txt
 ### ⚡ Parallel Command Execution
 
 Execute multiple commands simultaneously using `&`:
+
 ```bash
 wish> cmd1 & cmd2 & cmd3
 wish> echo First & echo Second & echo Third
@@ -106,12 +122,14 @@ wish> ls > out1.txt & date > out2.txt & pwd > out3.txt
 ```
 
 **Features:**
+
 - All commands start simultaneously before any waiting
 - Shell waits for all processes to complete
 - Works seamlessly with output redirection
 - Supports `&` without surrounding spaces: `cmd1&cmd2` works!
 
 **Restrictions:**
+
 - Built-in commands cannot run in parallel with other commands
 - Example: `cd /tmp & ls` will error
 
@@ -128,24 +146,28 @@ wish> ls > out1.txt & date > out2.txt & pwd > out3.txt
   - Redirection syntax errors
   - File I/O errors
 
-## 🔨 Building
+## Building
 
 ### Prerequisites
+
 - GCC compiler
 - Standard C library
 - POSIX-compliant system (Linux, macOS, etc.)
 
 ### Compilation
+
 ```bash
 gcc -Wall -Wextra -o wish main.c
 ```
 
 The executable `wish` will be created in the current directory.
 
-## 🚀 Usage
+## Usage
 
 ### Interactive Mode
+
 Start the shell without arguments:
+
 ```bash
 ./wish
 wish> ls
@@ -155,12 +177,15 @@ wish> exit
 ```
 
 ### Batch Mode
+
 Execute commands from a file:
+
 ```bash
 ./wish script.txt
 ```
 
 **Example batch file** (`script.txt`):
+
 ```bash
 path /bin /usr/bin
 echo Starting batch execution
@@ -169,9 +194,10 @@ date > timestamp.txt
 cat files.txt
 ```
 
-## 🎬 Demo
+## Demo
 
 ### Basic Commands
+
 ```bash
 $ ./wish
 wish> ls
@@ -184,6 +210,7 @@ wish> exit
 ```
 
 ### Path Management
+
 ```bash
 wish> path /bin /usr/bin
 wish> ls                    # Works - ls is in /bin
@@ -197,6 +224,7 @@ main.c  wish
 ```
 
 ### Output Redirection
+
 ```bash
 wish> ls -l > filelist.txt
 wish> cat filelist.txt
@@ -209,6 +237,7 @@ Thu Oct 17 10:30:45 AM EDT 2025
 ```
 
 ### Redirection Without Spaces
+
 ```bash
 wish> echo Testing>output.txt
 wish> cat output.txt
@@ -221,6 +250,7 @@ drwxr-xr-x 2 user user 4096 Oct 17 10:31 .
 ```
 
 ### Parallel Execution
+
 ```bash
 wish> echo First & echo Second & echo Third
 First
@@ -235,6 +265,7 @@ wish> cat dir.txt
 ```
 
 ### Combined Features
+
 ```bash
 wish> path /bin /usr/bin
 wish> echo Line1 > out1.txt & echo Line2 > out2.txt & echo Line3 > out3.txt
@@ -245,6 +276,7 @@ Line3
 ```
 
 ### Error Handling
+
 ```bash
 wish> cd                    # Wrong number of arguments
 An error has occurred
@@ -260,12 +292,14 @@ wish> ls >                  # No file after >
 An error has occurred
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Test Suite
+
 The project includes a comprehensive test suite with 22 tests covering all features.
 
 **Run all tests:**
+
 ```bash
 ./run_tests.sh
 ```
@@ -273,6 +307,7 @@ The project includes a comprehensive test suite with 22 tests covering all featu
 ### Test Results: ✅ 22/22 Passing (100%)
 
 #### Test Coverage
+
 1. ✅ Bad cd (no arguments)
 2. ✅ Bad cd (2 arguments)
 3. ✅ ls with bad directory name
@@ -297,6 +332,7 @@ The project includes a comprehensive test suite with 22 tests covering all featu
 22. ✅ Parallel execution verification (not serial)
 
 ### Test Categories
+
 - **Built-in Commands**: Tests for `exit`, `cd`, and `path`
 - **Redirection**: All redirection scenarios including edge cases
 - **Parallel Execution**: Multiple commands with `&` operator
@@ -304,9 +340,10 @@ The project includes a comprehensive test suite with 22 tests covering all featu
 - **Batch Mode**: File-based command execution
 - **Edge Cases**: Empty lines, whitespace variations, etc.
 
-## 🔍 Implementation Details
+## Implementation Details
 
 ### System Calls Used
+
 - `fork()` - Create child processes
 - `execv()` - Execute programs (not `system()` per spec)
 - `wait()` / `waitpid()` - Wait for child process completion
@@ -319,30 +356,40 @@ The project includes a comprehensive test suite with 22 tests covering all featu
 ### Key Design Decisions
 
 #### 1. Redirection Normalization
+
 The `normalize_redirection()` function preprocesses input to add spaces around `>`, allowing flexible syntax:
+
 - `cmd>file` → `cmd > file`
 - `cmd >file` → `cmd > file`
 - `cmd> file` → `cmd > file`
 
 #### 2. Parallel Execution Flow
-```
+
+```text
 Input → Split by & → Parse each command → Fork all processes → Wait for all
 ```
+
 - All child processes are started before any `wait()` calls
 - Ensures true parallelism, not sequential execution
 
 #### 3. Error Detection
+
 Parse errors are detected early and prevent command execution, avoiding duplicate error messages.
 
 #### 4. Both stdout and stderr Redirection
+
 Per specification, both stdout (fd 1) and stderr (fd 2) are redirected to the same file:
+
 ```c
 dup2(fd, STDOUT_FILENO);
 dup2(fd, STDERR_FILENO);
 ```
 
 ### Code Structure
-```
+
+```text
+
+```text
 main.c (423 lines)
 ├── Error handling (print_error)
 ├── Path management (init_paths, find_executable)
@@ -353,9 +400,9 @@ main.c (423 lines)
 └── Entry point (main)
 ```
 
-## 📁 Project Structure
+## Project Structure
 
-```
+```text
 Unix-Shell/
 ├── main.c              # Complete shell implementation (423 lines)
 ├── wish                # Compiled executable
@@ -375,6 +422,7 @@ Unix-Shell/
 ## 🎓 Learning Outcomes
 
 This project demonstrates understanding of:
+
 - **Process Management**: Fork-exec model, process creation and synchronization
 - **System Calls**: Low-level OS interfaces for process control and I/O
 - **File Descriptors**: Manipulation for I/O redirection
